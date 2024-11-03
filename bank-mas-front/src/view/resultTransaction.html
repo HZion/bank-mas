@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>송금 완료</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="p-4 flex items-center border-b">
+    <a href="/home" class="text-2xl mr-4">←</a>
+    <h1 class="text-xl font-bold">토스뱅크 송금</h1>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow flex flex-col items-center justify-center p-4">
+    <div class="bg-blue-500 rounded-full p-4 mb-6">
+      <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+    <h2 class="text-2xl font-bold mb-2 text-center" th:text="${recvAccount.getBankName()} + ' ' + ${T(com.sion.bank.service.AccountServiceImple).convertToKorean(recvAccount.accountType)} + '로'">내 자립예탁금 계좌로</h2>
+    <p class="text-3xl font-bold mb-4 text-center" th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT') + '원을'}">1,000원을</p>
+    <p class="text-xl mb-8 text-center">보냈어요</p>
+
+    <form action="/home" method="get" class="w-full">
+      <input type="hidden" name="transferId" value="YOUR_TRANSFER_ID_HERE">
+      <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium">
+        확인
+      </button>
+    </form>
+  </main>
+</div>
+</body>
+</html>

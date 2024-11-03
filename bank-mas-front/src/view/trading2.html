@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 거래</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="p-4 flex items-center border-b">
+            <a href="/home" class="text-2xl mr-4">←</a>
+            <h1 class="text-xl font-bold">실시간 주식</h1>
+        </header>
+
+        <!-- 거래 버튼 섹션 -->
+        <div class="px-4 mb-4 space-y-2">
+            <button class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600">
+                매수
+            </button>
+            <button class="w-full bg-red-500 text-white py-3 rounded-lg font-bold hover:bg-red-600">
+                매도
+            </button>
+        </div>
+      
+        <!-- 트레이딩뷰 차트 컨테이너 -->
+        <div class="w-full mb-4 p-2">
+            <div id="tradingview_chart" class="w-full h-[400px]"></div>
+        </div>
+
+        <!-- 심볼 선택 리스트 -->
+        <div class="px-4 mb-4">
+            <select id="symbolSelector" class="w-full p-2 border rounded-lg">
+                <option value="TSLA">Tesla (TSLA)</option>
+                <option value="AAPL">Apple (AAPL)</option>
+                <option value="NVDA">NVIDIA (NVDA)</option>
+                <option value="NDX">NASDAQ (NDX)</option>
+
+            </select>
+        </div>
+
+        <!-- 종목 정보 섹션 -->
+        <div id="symbolInfo" class="px-4 mb-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 id="symbolName" class="text-lg font-semibold">Tesla (TSLA)</h2>
+                    <span id="priceChange" class="text-green-600 font-bold">+3.24%</span>
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <span class="text-gray-600">현재가</span>
+                        <p id="currentPrice" class="font-bold">$54,320.50</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-gray-600">거래량</span>
+                        <p id="tradeVolume" class="font-bold">$2.3B</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 차트 설정 및 초기화 스크립트 -->
+        <script type="text/javascript">
+            let widget;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // TradingView 위젯 초기화 함수
+                function initializeWidget(symbol) {
+                    if (widget) {
+                        document.getElementById('tradingview_chart').innerHTML = ""; // 기존 차트를 제거
+                    }
+
+                    widget = new TradingView.widget({
+                        "width": "100%",
+                        "height": 400,
+                        "symbol": symbol,
+                        "interval": "D",
+                        "timezone": "Asia/Seoul",
+                        "theme": "dark",
+                        "style": "1",
+                        "locale": "ko",
+                        "toolbar_bg": "#f1f3f6",
+                        "enable_publishing": false,
+                        "allow_symbol_change": true,
+                        "container_id": "tradingview_chart",
+                        "hide_side_toolbar": false,
+                        "save_image": false,
+                        "studies": [
+                            "MASimple@tv-basicstudies"
+                        ]
+                    });
+                }
+
+                // 초기 차트 로드
+                initializeWidget("TSLA");
+
+                // 심볼 선택 이벤트 리스너
+                document.getElementById('symbolSelector').addEventListener('change', function(e) {
+                    const selectedSymbol = e.target.value;
+                    initializeWidget(selectedSymbol);
+                    updateSymbolInfo(selectedSymbol);
+                });
+
+                // 심볼 정보 업데이트 함수 (모의 데이터)
+                function updateSymbolInfo(symbol) {
+                    const symbolInfo = {
+                        'TSLA': { 
+                            name: '테슬라 (TSLA)', 
+                            price: '$252.50', 
+                            change: '+3.24%',
+                            volume: '$2.3B'
+                        },
+                        'AAPL': { 
+                            name: '애플 (ETH/USD)', 
+                            price: '$224,87', 
+                            change: '+2.15%',
+                            volume: '$1.2B'
+                        },
+                        'NVDA': { 
+                            name: '엔비디아 (NVDA)', 
+                            price: '$138.25', 
+                            change: '+1.87%',
+                            volume: '$0.5B'
+                        },
+                        'NDX': { 
+                            name: '나스닥 (DOGE/USDT)', 
+                            price: '$20,100.00', 
+                            change: '+4.32%',
+                            volume: '$0.3B'
+                        },
+                     
+                    };
+
+                    const info = symbolInfo[symbol] || symbolInfo['BTCUSD'];
+
+                    document.getElementById('symbolName').textContent = info.name;
+                    document.getElementById('currentPrice').textContent = info.price;
+                    document.getElementById('priceChange').textContent = info.change;
+                    document.getElementById('tradeVolume').textContent = info.volume;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toss Clone - 기능 목록</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen">
+    <!-- Header -->
+    <header class="p-4 flex items-center border-b">
+        <button class="text-2xl mr-4">←</button>
+        <h1 class="text-xl font-bold">설정</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 pb-20 ">
+        <ul class="space-y-4">
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>내 정보</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>토스 프라임</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>인증 및 보안</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <form  action="account" method="get">
+            <li class="flex justify-between items-center py-2 border-b">
+                <button type="submit">계좌 생성</button>
+                <button type="submit" class="text-gray-400">→</button>
+            </li>
+            </form>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>결제 설정</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>화면 설정</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>약관 및 개인정보 처리 동의</span>
+                <span class="text-gray-400">→</span>
+            </li>
+            <li class="flex justify-between items-center py-2 border-b">
+                <span>계좌/카드 보그인 정보 백업</span>
+                <span class="text-gray-400">→</span>
+            </li>
+        </ul>
+
+        <div class="mt-6 space-y-4">
+            <div class="flex justify-between items-center">
+                <span>홈에서 화면 잠그하기</span>
+                <button class="w-12 h-6 bg-gray-300 rounded-full p-1 duration-300 ease-in-out">
+                    <div class="bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out"></div>
+                </button>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>스크린샷 전송</span>
+                <button class="w-12 h-6 bg-gray-300 rounded-full p-1 duration-300 ease-in-out">
+                    <div class="bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <p class="text-sm text-gray-500">앱버전 : 4.114.0</p>
+            <p class="text-sm text-gray-500">최종 업데이트 : 2024. 02. 04 13:00</p>
+        </div>
+
+        <div class="mt-6">
+            <button id="logoutButton" class="w-full text-left text-red-500 py-2">
+                로그아웃
+            </button>
+        </div>
+    </main>
+</div>
+
+</body>
+<!--footer-->
+<footer class="fixed bottom-0 left-0 right-0 bg-white border-t">
+    <div class="max-w-md mx-auto flex justify-between items-center p-4">
+        <form action="/home" method="get">
+            <button type="submit" class="flex flex-col items-center">
+                <span class="text-2xl text-blue-500">🏠</span>
+                <span class="text-xs mt-1">홈</span>
+            </button>
+        </form>
+        <form action="/home" method="get">
+        <button class="flex flex-col items-center">
+            <span class="text-2xl">💳</span>
+            <span class="text-xs mt-1">내 소비</span>
+        </button>
+        </form>
+        <form action="/home" method="get">
+        <button class="flex flex-col items-center">
+            <span class="text-2xl">➕</span>
+            <span class="text-xs mt-1">보내기</span>
+        </button>
+        </form>
+        <form action="/all-functions" method="get">
+        <button class="flex flex-col items-center">
+            <span class="text-2xl">☰</span>
+            <span class="text-xs mt-1">전체</span>
+        </button>
+        </form>
+  
+    </div>
+  </footer>
+  <script>
+  document.getElementById('logoutButton').addEventListener('click', async (e) => {
+    e.preventDefault(); // 기본 동작 막기 (폼 제출 방지)
+
+    const token = localStorage.getItem('token'); // 로컬스토리지에서 토큰 가져오기
+
+    if (!token) {
+        console.error("로그인된 사용자가 없습니다.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/users/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Authorization 헤더에 Bearer 토큰 추가
+            }
+        });
+
+        if (response.ok) {
+            console.log("로그아웃 성공");
+            localStorage.removeItem('token'); // 토큰 제거
+            localStorage.removeItem('username'); // username 제거
+            window.location.href = '/login'; // 로그인 페이지로 리다이렉트
+        } else {
+            console.error('로그아웃 실패');
+        }
+    } catch (error) {
+        console.error('로그아웃 처리 중 오류가 발생했습니다:', error);
+    }
+});
+  </script>
+</html>
+

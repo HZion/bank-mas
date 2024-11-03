@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 상세 - Toss Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen">
+    <!-- Header -->
+    <header class="p-4 flex items-center border-b">
+        <a href="/home" class="text-2xl mr-4">←</a>
+        <h1 class="text-xl font-bold" th:text="${account.accountName}">자립예탁금</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4">
+        <!-- Account Number and Balance -->
+        <div class="mb-6">
+            <p class="text-gray-500">
+                <span th:text="${account.bankName}">은행이름</span>
+                <span th:text="${account.accountNumber}">계좌번호</span>
+            </p>
+            <h2 class="text-3xl font-bold mt-2" th:text="${#numbers.formatDecimal(account.balance, 0, 'COMMA', 0, 'POINT') + '원'}">246,954원</h2>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-4 mb-6">
+            <form action="/checkAccount" method="post" class="flex-1">
+                <button type="submit" class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold">채우기</button>
+                <input type="hidden" name="id" th:value="${account.id}">
+            </form>
+            <form action="/checkAccount" method="post" class="flex-1">
+                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold">보내기</button>
+                <input type="hidden" name="id" th:value="${account.id}">
+            </form>
+        </div>
+
+        <!-- Transaction List -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold">전체</h3>
+                <span>🔍</span>
+            </div>
+            <ul>
+                <li th:each="transaction : ${transactions}" class="flex justify-between items-center mb-4">
+                    <div>
+                        <p class="font-semibold"
+                           th:text="${transaction.fromAccount.id == account.id ? '출금' : '입금'}">
+                            거래 유형
+                        </p>
+                        <p class="text-sm text-gray-500"
+                           th:text="${transaction.fromAccount.id == account.id ?
+                                     transaction.toAccount.accountNumber :
+                                     transaction.fromAccount.accountNumber}">
+                            상대방 계좌번호
+                        </p>
+                        <p class="text-sm text-gray-500"
+                           th:text="${#temporals.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm')}">
+                            날짜 및 시간
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p th:text="${#numbers.formatDecimal(transaction.amount, 0, 'COMMA', 0, 'POINT') + '원'}"
+                           th:class="${transaction.fromAccount.id == account.id ? 'text-red-500' : 'text-blue-500'}">
+                            금액
+                        </p>
+                        <p class="text-sm text-gray-500"
+                           th:text="${#numbers.formatDecimal(transaction.fromAccount.id == account.id ?
+                                     transaction.fromAccountBalanceAfter :
+                                     transaction.toAccountBalanceAfter, 0, 'COMMA', 0, 'POINT') + '원'}">
+                            거래 후 잔액
+                        </p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </main>
+</div>
+</body>
+</html>

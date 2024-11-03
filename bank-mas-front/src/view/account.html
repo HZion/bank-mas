@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 생성</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen p-6">
+    <header class="mb-6">
+        <form action="/home" method="get">
+            <button class="text-2xl mb-4">←</button>
+        </form>
+
+        <h1 class="text-2xl font-bold">계좌 생성</h1>
+        <p class="text-gray-600">입력한 정보가 맞다면 아래 확인 버튼을 눌러주세요.</p>
+    </header>
+
+    <form id=accountForm action="/account" method="post" class="space-y-4">
+        <div>
+            <label for="accountName" class="block text-sm font-medium text-gray-700">계좌 이름</label>
+            <input type="text" id="accountName" name="accountName" required
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+
+        <div>
+            <label for="bankName" class="block text-sm font-medium text-gray-700">은행명</label>
+            <select id="bankName" name="bankName" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <option value="">선택하세요</option>
+                <option value="토스뱅크">토스뱅크</option>
+                <option value="국민은행">국민은행</option>
+                <option value="신한은행">신한은행</option>
+                <option value="우리은행">우리은행</option>
+                <!-- 필요한 만큼 옵션 추가 -->
+            </select>
+        </div>
+
+        <div>
+            <label for="accountType" class="block text-sm font-medium text-gray-700">계좌 종류</label>
+            <select id="accountType" name="accountType" required
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                <option value="">선택하세요</option>
+                <option value="CHECKING">입출금 계좌</option>
+                <option value="SAVINGS">저축 계좌</option>
+                <option value="MONEY_MARKET">MMF</option>
+                <option value="CERTIFICATE_OF_DEPOSIT">정기 예금</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="initialBalance" class="block text-sm font-medium text-gray-700">초기 잔액</label>
+            <input type="number" id="initialBalance" name="initialBalance" step="0.01" min="0"
+                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+
+        <div>
+            <button type="submit"
+                    class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                확인
+            </button> 
+        </div>
+    </form>
+</div>
+</body>
+<script>
+   // 페이지 로드 시 토큰 확인
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        // 토큰이 없으면 로그인 페이지로 리다이렉트
+        window.location.href = '/login';
+        return;
+    }
+    
+    console.log('Stored token:', token);  // 토큰 확인용
+});
+
+// 폼 제출 시 토큰 사용
+document.getElementById('accountForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('로그인이 필요합니다.');
+        window.location.href = '/login';
+        return;
+    }
+
+    const formData = {
+        accountName: document.getElementById('accountName').value,
+        bankName: document.getElementById('bankName').value,
+        accountType: document.getElementById('accountType').value,
+        initialBalance: parseFloat(document.getElementById('initialBalance').value) || 0
+    };
+
+    try {
+        const response = await fetch('/api/accounts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`  // 저장된 토큰 사용
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert(data.message || '계좌가 성공적으로 생성되었습니다.');
+            window.location.href = data.redirectUrl || '/home';
+        } else {
+            if (response.status === 401) {
+                // 토큰이 유효하지 않은 경우
+                localStorage.removeItem('token');  // 토큰 삭제
+                window.location.href = '/login';
+            } else {
+                alert(data.message || '계좌 생성에 실패했습니다.');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('계좌 생성 중 오류가 발생했습니다.');
+    }
+});
+</script>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>송금 완료</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script> <!-- 트레이딩뷰 차트를 위한 스크립트 추가 -->
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="p-4 flex items-center border-b">
+    <a href="/home" class="text-2xl mr-4">←</a>
+    <h1 class="text-xl font-bold">주식</h1>
+  </header>
+
+
+    <!-- 트레이딩뷰 차트 추가 -->
+    <div class="w-full mb-8">
+      <div id="tradingview_chart"></div>
+      <script type="text/javascript">
+        new TradingView.widget(
+          {
+            "width": "100%", // 차트의 폭을 부모 요소의 너비에 맞춤
+            "height": 400,
+            "symbol": "BTCUSD",  // 원하는 종목으로 변경 가능
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "light",
+            "style": "1",
+            "locale": "ko",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart"
+          }
+        );
+      </script>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

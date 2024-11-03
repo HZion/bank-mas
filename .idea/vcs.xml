@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/JavaMsaRedis" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bank-eureka" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/bank-mas-front" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/javaMsaAccount" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/javaMsaSCG" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/javaMsaUser" vcs="Git" />
+  </component>
+</project>

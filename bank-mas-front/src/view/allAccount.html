@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 목록 - Toss Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div class="max-w-md mx-auto bg-white min-h-screen">
+    <!-- Header -->
+    <header class="p-4 flex items-center border-b">
+        <a href="/home" class="text-2xl mr-4 text-gray-600">←</a>
+        <h1 class="text-xl font-bold text-gray-800">자산</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4">
+        <!-- Total Assets -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700">총 자산</h2>
+            <p id="totalBalance" class="text-3xl font-bold mt-2 text-gray-900">0원</p>
+        </div>
+
+        <!-- Accounts List -->
+        <div>
+            <h3 class="text-lg font-semibold mb-4 text-gray-700">계좌</h3>
+            <ul id="accountsList" class="space-y-4">
+                <!-- 계좌 목록이 여기에 동적으로 추가됩니다 -->
+            </ul>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/accounts/my', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch accounts');
+            }
+
+            const data = await response.json();
+            renderAllAccounts(data);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('계좌 정보를 불러오는데 실패했습니다.');
+        }
+    });
+
+    function renderAllAccounts(data) {
+        const accountsList = document.getElementById('accountsList');
+        const totalBalanceElement = document.getElementById('totalBalance');
+
+        // 총 자산 표시
+        totalBalanceElement.textContent = formatCurrency(data.stats.totalBalance) + '원';
+
+        // 계좌 목록 렌더링
+        const accountsHtml = data.accounts.map(account => `
+            <li class="hover:bg-gray-50 rounded-lg transition duration-150 ease-in-out">
+                <div class="flex items-center justify-between p-4 border rounded-lg">
+                    <div class="flex items-center flex-grow">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full mr-4 flex items-center justify-center text-white text-lg">
+                            ${account.bankName.charAt(0)}
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between">
+                                <p class="font-semibold text-lg text-gray-800">
+                                    ${account.accountName}
+                                </p>
+                            </div>
+                            <p class="text-sm text-gray-500">
+                                ${account.bankName} ${convertAccountType(account.accountType)}
+                            </p>
+                            <p class="text-lg font-bold text-gray-900 mt-1">
+                                ${formatCurrency(account.balance)}원
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                ${maskAccountNumber(account.accountNumber)}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <form action="/checkAccount" method="post">
+                            <input type="hidden" name="id" value="${account.id}">
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out">
+                                송금
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        `).join('');
+
+        accountsList.innerHTML = accountsHtml;
+
+        // 계좌 유형 분포 표시 (선택적)
+        if (data.stats.accountTypeDistribution) {
+            const distributionHtml = `
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-700">계좌 유형 분포</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${Object.entries(data.stats.accountTypeDistribution).map(([type, count]) => `
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="text-sm text-gray-500">${convertAccountType(type)}</p>
+                                <p class="text-lg font-bold">${count}개</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            accountsList.insertAdjacentHTML('afterend', distributionHtml);
+        }
+    }
+
+    function convertAccountType(type) {
+        const types = {
+            'CHECKING': '입출금통장',
+            'SAVINGS': '저축예금',
+            'MONEY_MARKET': 'MMF',
+            'CERTIFICATE_OF_DEPOSIT': '정기예금'
+        };
+        return types[type] || type;
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('ko-KR').format(amount);
+    }
+
+    function maskAccountNumber(accountNumber) {
+        if (!accountNumber) return '';
+        const start = accountNumber.slice(0, 4);
+        const end = accountNumber.slice(-4);
+        return `${start}-****-${end}`;
+    }
+</script>
+</body>
+</html>
