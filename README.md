@@ -19,7 +19,9 @@ redis 6379
 
 <br>
 -시연 영상<br>
+
 ![ScreenRec_2024-11-19 21-26-49](https://github.com/user-attachments/assets/fe870152-6f00-4d17-a3ef-e41510ba49d5)
+
 <br>
 
 -db 테이블<br>
